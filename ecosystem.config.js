@@ -24,6 +24,8 @@ export const apps = [
       HOST: process.env.HOST || '0.0.0.0',
       ZOKOANIME_BASE_URL: process.env.ZOKOANIME_BASE_URL || 'https://zokoanime.video',
       CACHE_TTL_MS: process.env.CACHE_TTL_MS || 300000,
+      UPSTREAM_PROXY: process.env.UPSTREAM_PROXY || '',
+      HTTP_PROXY: process.env.HTTP_PROXY || '',
     },
     env_development: {
       NODE_ENV: 'development',

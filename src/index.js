@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import { createApp } from './app.js';
+import { initProxyAgent } from './proxy-agent.js';
 
 dotenv.config();
+initProxyAgent();
 
 const port = parseInt(process.env.PORT || '3008', 10);
 const host = process.env.HOST || '0.0.0.0';

@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import { defaultClient } from './client.js';
 import { createApp } from './app.js';
+import { initProxyAgent } from './proxy-agent.js';
+
+initProxyAgent();
 
 const args = process.argv.slice(2);
 const command = args[0];

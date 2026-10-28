@@ -1,6 +1,7 @@
 import { deobfuscate, extractPayloadFromHtml, extractKiwiM3u8 } from './deobfuscate.js';
 import { parseMasterM3u8, parsePlayerUrl, buildEmbedUrl } from './parsers.js';
 import { defaultCache } from './cache.js';
+import { proxyFetch } from './proxy-agent.js';
 
 export const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
 
@@ -35,7 +36,7 @@ export class ZokoAnimeClient {
     const timer = setTimeout(() => controller.abort(), this.timeout);
 
     try {
-      const res = await fetch(url, {
+      const res = await proxyFetch(url, {
         signal: controller.signal,
         headers: {
           'User-Agent': this.userAgent,

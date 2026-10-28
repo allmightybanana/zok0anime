@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { proxyFetch } from '../proxy-agent.js';
 
 export const proxyRouter = Router();
 
@@ -31,7 +32,7 @@ proxyRouter.get('/stream', async (req, res, next) => {
   };
 
   try {
-    const upstreamRes = await fetch(targetUrl, {
+    const upstreamRes = await proxyFetch(targetUrl, {
       headers: upstreamHeaders
     });
 
@@ -52,9 +53,12 @@ proxyRouter.get('/stream', async (req, res, next) => {
       const baseUrl = new URL(targetUrl);
       const basePath = baseUrl.pathname.substring(0, baseUrl.pathname.lastIndexOf('/') + 1);
 
-      const host = req.get('host');
-      const proto = req.protocol;
-      const proxyBase = `${proto}://${host}/api/proxy/stream`;
+      // Use query-relative proxy URL (?url=...) so the client/player resolves
+      // relative to whatever endpoint served this manifest (e.g. /notsosecretapi/api/proxy/stream
+      // on production, /api/proxy/stream on localhost or any reverse-proxy subpath).
+      const proxyBase = '?url=';
+
+
 
       const encodedHeadersParam = req.query.headers ? `&headers=${encodeURIComponent(req.query.headers)}` : '';
 
@@ -73,7 +77,7 @@ proxyRouter.get('/stream', async (req, res, next) => {
                   absoluteUri = `${baseUrl.origin}${basePath}${uri}`;
                 }
               }
-              return `URI="${proxyBase}?url=${encodeURIComponent(absoluteUri)}${encodedHeadersParam}"`;
+              return `URI="${proxyBase}${encodeURIComponent(absoluteUri)}${encodedHeadersParam}"`;
             });
           }
           return line;
@@ -92,7 +96,7 @@ proxyRouter.get('/stream', async (req, res, next) => {
           }
         }
 
-        return `${proxyBase}?url=${encodeURIComponent(absoluteUrl)}${encodedHeadersParam}`;
+        return `${proxyBase}${encodeURIComponent(absoluteUrl)}${encodedHeadersParam}`;
       }).join('\n');
 
       return res.send(rewritten);
