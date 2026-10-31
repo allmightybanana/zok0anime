@@ -1,13 +1,9 @@
-version: '3.8'
-
 services:
   zokoanime-scraper:
     build: .
-    container_name: zokoanime-scraper
     ports:
       - "3008:3008"
     environment:
-      - PORT=3008
-      - HOST=0.0.0.0
-      - CACHE_TTL_MS=300000
-    restart: unless-stopped
+      PORT: 3008
+      HOST: 0.0.0.0
+      CACHE_TTL_MS: 300000
