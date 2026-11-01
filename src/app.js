@@ -15,9 +15,52 @@ export function createApp() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  // Normalize Netlify function path prefix if invoked directly or rewritten with prefix
+  app.use((req, res, next) => {
+    if (req.url.startsWith('/.netlify/functions/api')) {
+      req.url = req.url.slice('/.netlify/functions/api'.length) || '/';
+    } else if (req.url.startsWith('/.netlify/functions/')) {
+      const parts = req.url.split('/');
+      req.url = '/' + parts.slice(4).join('/') || '/';
+    }
+    if (!req.url.startsWith('/')) {
+      req.url = '/' + req.url;
+    }
+    next();
+  });
+
+  // Swagger Documentation configuration with CDN fallback for serverless compatibility
+  const swaggerUiOptions = {
+    customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.min.js'
+    ],
+    customSiteTitle: 'ZokoAnime Scraper API Docs'
+  };
+
+  // Root / Welcome endpoint
+  app.get('/', (req, res) => {
+    res.json({
+      service: 'zokoanime-scraper',
+      status: 'ok',
+      version: '1.0.0',
+      description: 'ZokoAnime Scraper & Direct M3U8 API',
+      documentation: '/docs',
+      health: '/health',
+      endpoints: {
+        stream: '/api/stream',
+        proxy: '/api/proxy/stream',
+        cacheStats: '/api/cache/stats',
+        docs: '/docs',
+        health: '/health'
+      }
+    });
+  });
+
   // Swagger Documentation
   app.get('/openapi.json', (req, res) => res.json(openApiSpec));
-  app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec, swaggerUiOptions));
 
   // Health check
   app.get('/health', (req, res) => {

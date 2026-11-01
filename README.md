@@ -192,6 +192,28 @@ The container runs on port `3008`.
 
 ---
 
+## 🌐 Netlify Deployment
+
+This repository includes built-in Netlify Serverless support:
+
+1. Push this repository to GitHub/GitLab.
+2. Link the repository in [Netlify](https://app.netlify.com).
+3. The build configuration is automatically loaded from [`netlify.toml`](file:///c:/Users/USER/OneDrive/Desktop/JV-Hobbies/scraping/zokoanime-scraper/netlify.toml):
+   - **Functions directory**: `netlify/functions`
+   - **Publish directory**: `public`
+   - **Build command**: `npm run build`
+4. Set any optional environment variables in **Site configuration > Environment variables**:
+   - `CACHE_TTL_MS` (e.g. `300000`)
+   - `UPSTREAM_PROXY` / `HTTP_PROXY` (if using residential/datacenter proxies)
+5. To test locally with the Netlify CLI:
+   ```bash
+   npx netlify dev
+   ```
+
+> **Note on Video Streaming Proxy**: For high-volume proxy streaming via `/api/proxy/stream`, container hosts like Docker/VPS, Railway, or Render are recommended due to serverless execution and response size limits. All metadata extraction endpoints work natively on Netlify.
+
+---
+
 ## 🧪 Running Tests
 
 ```bash
